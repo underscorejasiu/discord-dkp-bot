@@ -1,0 +1,8 @@
+version: '3.6'
+services:
+  discord-dkp-bot:
+    build: ./
+    container_name: discord-dkp-bot
+    restart: always
+    environment:
+      NODE_ENV: 'test'

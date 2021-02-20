@@ -1,0 +1,69 @@
+{
+    "name": "discordbot",
+    "version": "1.0.0",
+    "description": "",
+    "main": "app.ts",
+    "scripts": {
+        "test": "mocha -r ts-node/register src/**/*.spec.ts",
+        "serve-prod": "node dist/app.js",
+        "serve-dev": "nodemon -L -V",
+        "serve-debug": "node --inspect=[::]:3002 dist/app.js",
+        "build": "tsc -p tsconfig.json",
+        "build-with-source": "tsc -p tsconfig.dev.json",
+        "lint": "eslint . --ext ts | prettier --list-different .",
+        "lint-fix": "eslint . --ext ts --fix | prettier --write ."
+    },
+    "nodemonConfig": {
+        "ext": "ts js json",
+        "watch": [
+            "src",
+            "app.ts",
+            "tsconfig.json"
+        ],
+        "exec": "(npm -q run build-with-source || exit 1) && npm -q run serve-debug"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged",
+            "pre-push": "npm run test"
+        }
+    },
+    "lint-staged": {
+        "*.ts": [
+            "eslint --fix",
+            "prettier --write"
+        ]
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "ajv": "^8.6.2",
+        "ascii-table": "^0.0.9",
+        "async": "^3.2.1",
+        "config": "^3.3.6",
+        "date-fns": "2.23.0",
+        "date-fns-tz": "1.1.6",
+        "discord.js": "^13.1.0",
+        "mongodb": "^4.1.0",
+        "ts-node": "^10.2.1",
+        "typescript": "^4.3.5"
+    },
+    "devDependencies": {
+        "@types/async": "^3.2.7",
+        "@types/chai": "^4.2.21",
+        "@types/mocha": "^9.0.0",
+        "@types/node": "16.7.1",
+        "@typescript-eslint/eslint-plugin": "^4.29.3",
+        "@typescript-eslint/parser": "^4.29.3",
+        "chai": "^4.3.4",
+        "eslint": "^7.32.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-import": "^2.24.1",
+        "eslint-plugin-prettier": "^3.4.1",
+        "husky": "^4.2.5",
+        "lint-staged": "^11.1.2",
+        "mocha": "^9.1.0",
+        "nodemon": "2.0.3",
+        "prettier": "^2.3.2"
+    }
+}

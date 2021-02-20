@@ -1,0 +1,15 @@
+version: '3.6'
+services:
+  discord-dkp-bot:
+    build: ./
+    container_name: discord-dkp-bot
+    restart: always
+    environment:
+      NODE_ENV: 'prod'
+      NODE_CONFIG: ${NODE_CONFIG}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+secrets:
+  NODE_CONFIG:
+    external: true

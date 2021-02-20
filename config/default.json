@@ -1,0 +1,10 @@
+{
+    "discord": {
+        "token": "BOT_DISCORD_ACCESS_TOKEN",
+        "prefix": "!t-"
+    },
+    "db": {
+        "uri": "DONT_COMMIT_CREDENTIALS"
+    }
+}
+

@@ -1,0 +1,78 @@
+import { Collection, Guild, Message, Snowflake } from 'discord.js';
+import { InvalidUsageError } from '../../models/invalid-ussage-error.model';
+import { parsePermissionType } from './parsers/parse-permission-type';
+import { parseApplicableRoles } from './parsers/parse-applicable-roles';
+import { dkpRolesService } from '../../services/dkp-privileged-roles.service';
+import { Permissions } from '../../models/dkp-permissions';
+
+export async function removePermission(
+    msg: Message,
+    args: string[]
+): Promise<string> {
+    const guildId = (msg.guild as Guild).id;
+    const permissionsDetails: {
+        type: Permissions | null;
+        roles: Snowflake[];
+    } = {
+        type: null,
+        roles: [],
+    };
+    if (args.length > 1) {
+        permissionsDetails.type = parsePermissionType(args[1]);
+        permissionsDetails.roles = await parseApplicableRoles(
+            permissionsDetails.type,
+            msg,
+            true
+        );
+    } else {
+        try {
+            await msg.reply(`Please permission name:`);
+            const collectedName = await msg.channel.awaitMessages({
+                filter: (response: Message) =>
+                    msg.author.id === response.author.id,
+                max: 1,
+                time: 30000,
+                errors: ['time'],
+            });
+
+            permissionsDetails.type = parsePermissionType(
+                (collectedName.first() as Message).content
+            );
+
+            await msg.reply(
+                `Please mention roles that should have removed ${permissionsDetails.type} permission:`
+            );
+            const collectedRoles = await msg.channel.awaitMessages({
+                filter: (response: Message) =>
+                    msg.author.id === response.author.id,
+                max: 1,
+                time: 30000,
+                errors: ['time'],
+            });
+            permissionsDetails.roles = await parseApplicableRoles(
+                permissionsDetails.type,
+                collectedRoles.first() as Message,
+                true
+            );
+        } catch (error) {
+            if (error instanceof Collection) {
+                throw new InvalidUsageError('Got no response. Aborting.');
+            }
+
+            throw error;
+        }
+    }
+
+    await dkpRolesService.editRoles(
+        {
+            roleId: { $in: permissionsDetails.roles },
+            permissionType: permissionsDetails.type,
+            guildId,
+        },
+        { $set: { active: false } }
+    );
+
+    return `Removed permission to ${
+        permissionsDetails.type
+    } for roles: ${permissionsDetails.roles.map((roleId) => `<@&${roleId}>`)}.`;
+}
