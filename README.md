@@ -1,3 +1,5 @@
+# Project from 2019/2020, published after being replaced with new version.
+
 # Configuration
 
 Bot can be configured via process env.
